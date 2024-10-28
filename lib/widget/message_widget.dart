@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 
 class MessageWidget extends StatelessWidget {
   final String message;
@@ -24,7 +24,6 @@ class MessageWidget extends StatelessWidget {
       }
     }
 
-    // Extract code blocks from the message
     List<String> extractCodeBlocks(String message) {
       final RegExp codeBlockRegex = RegExp(r'```(.*?)```', dotAll: true);
       return codeBlockRegex
@@ -64,7 +63,11 @@ class MessageWidget extends StatelessWidget {
             child: Stack(
               children: [
                 MarkdownBody(
-                  data: isfromUser ? displayMessage : message,
+                  data: isfromUser
+                      ? displayMessage
+                      : (message.trim() != "")
+                          ? message
+                          : "No response available",
                   selectable: true,
                   styleSheet: MarkdownStyleSheet(
                     p: const TextStyle(
@@ -91,15 +94,13 @@ class MessageWidget extends StatelessWidget {
                     ),
                   ),
                 ),
-                if (codeBlocks
-                    .isNotEmpty) // Show copy button only if there are code blocks
+                if (codeBlocks.isNotEmpty)
                   Positioned(
                     right: 8.0,
                     top: 8.0,
                     child: IconButton(
                       icon: const Icon(Icons.copy, color: Colors.black54),
                       onPressed: () {
-                        // Copy the first code block found
                         Clipboard.setData(
                             ClipboardData(text: codeBlocks.first));
                         ScaffoldMessenger.of(context).showSnackBar(
